@@ -88,7 +88,7 @@ class TicketList():
 
     def __str__(self):
         header = ["Libellé","Valeur"]
-        s = tabulate(self.getStatByList(), header)+"\n\n"
+        s = tabulate(self.getStatByList(), header, tablefmt="grid")+"\n\n"
         s += "Global\n\n"
-        s += tabulate(self.getGlobalStats(), header)+"\n\n"
+        s += tabulate(self.getGlobalStats(), header, tablefmt="grid")+"\n\n"
         return s

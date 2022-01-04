@@ -97,16 +97,16 @@ class Project():
         return [
             ["Nombre de semaines restantes",self.weeksRemaining()],
             ["Estimation fin de projet",self.endOfProject()],
-            ["Velocité nécessaire pour tenir la date du "+str(self.wishDate),self.wishedSprintSpeed()]
+            ["Vélocité nécessaire pour tenir la date du "+str(self.wishDate),self.wishedSprintSpeed()]
         ]
 
     def __str__(self):
         header = ["Libellé","Valeur"]
-        s = self.name+"\n\n"
-        s += "PARAMETRES GENERAUX\n\n"
-        s += tabulate(self.getInitialParams(), header)+"\n\n"
+        #s = "##############   "+self.name+"   #################\n\n"
+        s = "PARAMETRES GENERAUX\n\n"
+        s += tabulate(self.getInitialParams(), header, tablefmt="grid")+"\n\n"
         s += "NOMBRE DE SPRINTS\n\n"
-        s += tabulate(self.getSprintData(), header)+"\n\n"
+        s += tabulate(self.getSprintData(), header, tablefmt="grid")+"\n\n"
         s += "DATE DE FIN ESTIMEE\n\n"
-        s += tabulate(self.getProjectDate(), header)+"\n\n"
+        s += tabulate(self.getProjectDate(), header, tablefmt="grid")+"\n\n"
         return s
