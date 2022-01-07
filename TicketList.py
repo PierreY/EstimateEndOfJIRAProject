@@ -43,9 +43,13 @@ class TicketList():
         """Estimate the points that would need to be added to complete the estimated points """
         return round(self.averagePointsPerTicket()*self.nbToEstimate(self.backlogTickets()),1)
 
+    def pointsDone(self):
+        """Sum the points that are already in sprint"""
+        return self.points(self.tickets) - self.points(self.backlogTickets())
+
     def pointsToBeDone(self):
         """Estimate the points that need to be developed to end the project"""
-        return self.estimateTotalPoints() - (self.points(self.tickets) - self.points(self.backlogTickets()))
+        return self.estimateTotalPoints() - self.pointsDone()
 
     def averagePointsPerTicket(self):
         """Get average of points per ticket that have estimation - backlog and sprint"""
@@ -84,6 +88,8 @@ class TicketList():
             ["Points estimés",self.points(self.tickets)],
             ["Projection : points manquants",self.estimateMissingPoints()],
             ["Projection : points totaux",self.estimateTotalPoints()],
+            ["Points développés :",self.pointsDone()],
+            ["Points à développer :",self.pointsToBeDone()],
         ]
 
     def __str__(self):

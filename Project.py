@@ -1,10 +1,10 @@
 from tabulate import tabulate
 import datetime
-import csv
 import configparser
 from TicketList import TicketList
 from Ticket import Ticket
 from tkinter import Tk, filedialog
+import pandas as pd
 
 # HYPOTHESIS 1 : a ticket with 0 points is a ticket that has not been estimated
 # HYPOTHESIS 2 : a ticket having an empty sprint name is a ticket in the backlog
@@ -16,7 +16,8 @@ class Project():
         config = configparser.ConfigParser()
         config.read(confFile,encoding='utf-8')
         self.name = config['DEFAULT']['ProjectName']
-        self.ticketList = TicketList(self.setTicketsFromCSV(self.askCsv(), config['CSV']))
+        columnsToKeep = [config['CSV']["TicketNameField"],config['CSV']["TicketPointsField"],config['CSV']["TicketSprintField"]]
+        self.ticketList = TicketList(self.setTicketsFromCSV(self.askCsv(), columnsToKeep))
         self.sprintSpeed =  config['DEFAULT']['SprintDefaultSpeed']
         self.sprintDone = config['DEFAULT']['SprintDone']
         self.initialNbOfSprints = config['DEFAULT']['InitialNbOfSprints']
@@ -49,22 +50,18 @@ class Project():
         weeksWished = (self.wishDate - self.beginningNextSprint).days / 7
         return round(self.ticketList.pointsToBeDone() / (weeksWished/float(self.sprintDurationInWeeks)),1)
 
-    def setTicketsFromCSV(self, csvFilename, confCsv):
+    def setTicketsFromCSV(self, csvFilename, columnsToKeep):
         """Set ticket list of this project based on a CSV file gotten from JIRA filter"""
-
         tickets = []
-
-        with open(csvFilename, encoding='utf8') as csv_file:
-            csv_reader = csv.DictReader(csv_file, delimiter=',')
-
-            for row in csv_reader:
-
-                tickets.append(Ticket(
-                    row[confCsv["TicketNameField"]],
-                    0 if row[confCsv["TicketPointsField"]]=="" else int(float(row[confCsv["TicketPointsField"]])),
-                    row[confCsv["TicketSprintField"]]
-                    )
-                )
+        df = pd.DataFrame(pd.read_csv (csvFilename), columns=columnsToKeep)
+        # Replace all the Nan by empty string
+        df.fillna('', inplace=True)
+        for row in df.values.tolist():
+            tickets.append(Ticket(
+                row[0],
+                0 if row[1] == "" else int(float(row[1])),
+                row[2]
+            ))
         return tickets
 
     def askCsv(self):
